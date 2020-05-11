@@ -1,0 +1,39 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/data/map.dat</file>
+        <file>res/sound/bin.wav</file>
+        <file>res/sound/enemy-bomb.wav</file>
+        <file>res/sound/move.wav</file>
+        <file>res/sound/shoot.wav</file>
+        <file>res/pic/bg_gray.gif</file>
+        <file>res/pic/bullet-0.gif</file>
+        <file>res/pic/bump3.gif</file>
+        <file>res/pic/camp0.gif</file>
+        <file>res/pic/forest.gif</file>
+        <file>res/pic/ice.gif</file>
+        <file>res/pic/river-0.gif</file>
+        <file>res/pic/stone.gif</file>
+        <file>res/pic/wall.gif</file>
+        <file>res/pic/gray-tank/1-1-1.gif</file>
+        <file>res/pic/gray-tank/1-1-2.gif</file>
+        <file>res/pic/gray-tank/1-2-1.gif</file>
+        <file>res/pic/gray-tank/1-2-2.gif</file>
+        <file>res/pic/gray-tank/1-3-1.gif</file>
+        <file>res/pic/gray-tank/1-3-2.gif</file>
+        <file>res/pic/gray-tank/1-4-1.gif</file>
+        <file>res/pic/gray-tank/1-4-2.gif</file>
+        <file>res/sound/start.wav</file>
+        <file>res/pic/0Player/m0-0-1.gif</file>
+        <file>res/pic/0Player/m0-0-2.gif</file>
+        <file>res/pic/0Player/m0-1-1.gif</file>
+        <file>res/pic/0Player/m0-1-2.gif</file>
+        <file>res/pic/0Player/m0-2-1.gif</file>
+        <file>res/pic/0Player/m0-2-2.gif</file>
+        <file>res/pic/0Player/m0-3-1.gif</file>
+        <file>res/pic/0Player/m0-3-2.gif</file>
+        <file>res/pic/bullet-1.gif</file>
+        <file>res/pic/bullet-2.gif</file>
+        <file>res/pic/bullet-3.gif</file>
+        <file>res/pic/icon.png</file>
+    </qresource>
+</RCC>

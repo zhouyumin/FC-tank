@@ -11,6 +11,7 @@
 #include <QSound>
 #include <QList>
 #include <enemy.h>
+#include <QCoreApplication>
 
 class Widget : public QWidget
 {
@@ -23,8 +24,6 @@ private:
     QPixmap iron;
     QPixmap bg_gray;
     QPixmap camp;
-    QPixmap enemyIcon;
-    QPixmap playerIcon;
     void init();
     void createPlayer();
     player role1;

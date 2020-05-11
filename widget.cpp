@@ -204,7 +204,7 @@ void Widget::init()
     //加载地图
     loadMap();
     //加载图像
-    bg_gray.load((rootdir+"pic//bg_gray.gif").c_str());
+    bg_gray.load((rootdir+"pic\\bg_gray.gif").c_str());
     bg_gray=resizePic(bg_gray,SIZE,SIZE);
     grass.load((rootdir+"pic\\forest.gif").c_str());
     grass = resizePic(grass,BASESIZE,BASESIZE);
@@ -218,10 +218,8 @@ void Widget::init()
     ice = resizePic(ice,BASESIZE,BASESIZE);
     camp.load((rootdir+"pic\\camp0.gif").c_str());
     camp = resizePic(camp,SIZE,SIZE);
-    enemyIcon.load((rootdir+"pic\\enemytank-ico.gif").c_str());
-    enemyIcon = resizePic(enemyIcon,BASESIZE,BASESIZE);
 
-    QSound::play((rootdir+"\\sound\\start.wav").c_str());
+    QSound::play((rootdir+"sound\\start.wav").c_str());
     //创建敌人
     cursor=0;
     enemyNum = 20;
@@ -256,8 +254,10 @@ void Widget::loadMap()
     FILE *file;
     try
     {
-        if(NULL==(file=fopen((rootdir+"data\\map.dat").c_str(),"rb")))
+
+        if(NULL==(file=fopen((QCoreApplication::applicationDirPath()+"\\map.dat").toStdString().c_str(),"rb")))
             throw "can not open map.dat";
+
     }
     catch(const char *err)
     {
