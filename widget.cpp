@@ -255,7 +255,7 @@ void Widget::loadMap()
     try
     {
 
-        if(NULL==(file=fopen((QCoreApplication::applicationDirPath()+"\\map.dat").toStdString().c_str(),"rb")))
+        if(NULL==(file=fopen((QCoreApplication::applicationDirPath()+"\\res\\map.dat").toStdString().c_str(),"rb")))
             throw "can not open map.dat";
 
     }

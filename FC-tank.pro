@@ -1,6 +1,8 @@
 QT       += core gui
 QT       += multimedia
 
+RC_ICONS = tank.ico
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
