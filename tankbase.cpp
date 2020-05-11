@@ -4,10 +4,11 @@
 void tankBase::shot()
 {
     //子弹已经射出就 return
-    if(bullet.busy == true)
+    if(bullet.getActive() == true)
         return;
 
-    bullet.busy = true;
+//    bullet.bump=false;
+    bullet.setActive(true);
     bullet.setDir(dir);
 
     int deviation = (SIZE-bullet.w)/2;//弹道与坦克边界的偏移量
@@ -28,6 +29,10 @@ void tankBase::shot()
     {
         bullet.rect.setRect(rect.right()-bullet.h,rect.y()+deviation,bullet.h,bullet.w);
     }
+//    if(bullet.rect.x()==0||bullet.rect.y()==0||bullet.rect.x()>=13*SIZE||bullet.rect.y()>=13*SIZE)
+//    {
+//        bullet.busy=false;
+//    }
 }
 
 void tankBase::move()
@@ -141,7 +146,7 @@ bool tankBase::canReachable(int x, int y,direct dir)
 //        qDebug()<<"越界"<<x<<" "<<y;
         return false;
     }
-    //判断是否有障碍物
+//    判断是否有障碍物
     else if(map[y][x]<='2'&&map[y1][x1]<='2')//注意行和列与x,y的关系
     {
         return true;
@@ -155,6 +160,29 @@ bool tankBase::canReachable(int x, int y,direct dir)
 
 tankBase::tankBase()
 {
+}
+
+tankBase &tankBase::operator=(const tankBase &other)
+{
+    if(this==&other)return *this;
+    upimg1=other.upimg1;
+    upimg2=other.upimg2;
+    downimg1=other.downimg1;
+    downimg2=other.downimg2;
+    leftimg1=other.leftimg1;
+    leftimg2=other.leftimg2;
+    rightimg1=other.rightimg1;
+    rightimg2=other.rightimg2;
+    speed=other.speed;
+    rect=other.rect;
+    dir=other.dir;
+    bullet = other.bullet;
+    return *this;
+}
+
+tankBase::tankBase(const tankBase &other)
+{
+    *this=other;
 }
 
 tankBase::~tankBase()

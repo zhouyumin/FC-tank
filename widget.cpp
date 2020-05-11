@@ -9,23 +9,37 @@ Widget::Widget(QWidget *parent)
     setWindowIcon(QIcon((rootdir+"pic//icon.png").c_str()));
     gate=1;
     init();
-    timer = new QTimer(this);
-    timer->start(60);
-    connect(timer,&QTimer::timeout,this,&Widget::play);
+    timer1 = new QTimer(this);
+    timer1->start(120);
+    timer2 = new QTimer(this);
+    timer2->start(150);
+    timer3 = new QTimer(this);
+    timer3->start(1000);
+    timer4 = new QTimer(this);
+    timer4->start(60);
+    timer5 = new QTimer(this);
+    timer5->start(33);
+    connect(timer1,&QTimer::timeout,this,&Widget::play);
+    connect(timer2,&QTimer::timeout,this,&Widget::enemyMove);
+    connect(timer3,&QTimer::timeout,this,&Widget::enemyShot);
+    connect(timer4,&QTimer::timeout,this,&Widget::bulletMove);
+    connect(timer5,&QTimer::timeout,this,&Widget::refresh);
 }
 
 Widget::~Widget()
 {
-    delete timer;
-    delete start;
-    delete shoot;
+    delete timer1;
+    delete timer2;
+    delete timer3;
+    delete timer4;
+    delete timer5;
 }
 
 void Widget::keyPressEvent(QKeyEvent *event)
 {
     if(event->key()==Qt::Key::Key_W)
     {
-       role1.setDir(direct::up);
+        role1.setDir(direct::up);
     }
     else if(event->key()==Qt::Key::Key_S)
     {
@@ -41,10 +55,10 @@ void Widget::keyPressEvent(QKeyEvent *event)
     }
     else if(event->key()==Qt::Key::Key_J)
     {
-        if(!role1.bullet.busy)
+        if(!role1.bullet.getActive())
         {
             role1.shot();
-            shoot->play();
+            QSound::play((rootdir+"\\sound\\shoot.wav").c_str());
         }
     }
 
@@ -69,8 +83,8 @@ void Widget::collisionCheck()
     {
         if(true==role1.bullet.rect.intersects(enemy.bullet.rect))
         {
-            role1.bullet.busy=false;
-            enemy.bullet.busy=false;
+            role1.bullet.setActive(false);
+            enemy.bullet.setActive(false);
             break;
         }
     }
@@ -79,7 +93,7 @@ void Widget::collisionCheck()
     {
         if(true==role1.bullet.rect.intersects(enemy.rect))
         {
-
+            QSound::play((rootdir+"\\sound\\enemy-bomb.wav").c_str());
             enemies.removeOne(enemy);//需要重载 == 操作符
             enemyNum--;
             if(enemyNum<=0)
@@ -87,8 +101,7 @@ void Widget::collisionCheck()
                 return;
             }
             createEnemy();
-            role1.bullet.busy=false;
-
+            role1.bullet.setActive(false);
             break;
         }
     }
@@ -110,22 +123,16 @@ void Widget::nextGate()
 
 void Widget::play()
 {
-    static bool delay = false;
-    static bool pass = true;
-    delay =!delay;
-
-    //玩家子弹移动
-    if(role1.bullet.busy)
-    {
-        role1.bullet.move();
-    }
     //玩家移动
-    if(role1.ismove&&delay)
+    if(role1.ismove)
     {
-//            moveSound->play();
         role1.move();
-//            moveSound->stop();
+        QSound::play((rootdir+"\\sound\\move.wav").c_str());
     }
+}
+
+void Widget::enemyMove()
+{
     //敌方坦克移动
     static int d;
     srand((unsigned)time(NULL));
@@ -149,25 +156,41 @@ void Widget::play()
         {
             enemy.setDir(direct::down);
         }
-        if(!enemy.bullet.busy)
+        enemy.move();
+    }
+
+}
+
+void Widget::enemyShot()
+{
+    for(auto& enemy: enemies)
+    {
+        if(!enemy.bullet.getActive())
         {
             enemy.shot();
         }
-        if(enemy.bullet.busy)
+    }
+}
+
+void Widget::bulletMove()
+{
+    //玩家子弹移动
+    if(role1.bullet.getActive())
+    {
+        role1.bullet.move();
+    }
+    //敌人子弹移动
+    for(auto& enemy:enemies)
+    {
+        if(enemy.bullet.getActive())
         {
             enemy.bullet.move();
         }
-        if(delay)
-        {
-            if(pass)
-            {
-                enemy.move();
-            }
-            pass=!pass;
-        }
-
     }
+}
 
+void Widget::refresh()
+{
     collisionCheck();
     if(enemyNum<=0)
     {
@@ -195,12 +218,10 @@ void Widget::init()
     ice = resizePic(ice,BASESIZE,BASESIZE);
     camp.load((rootdir+"pic\\camp0.gif").c_str());
     camp = resizePic(camp,SIZE,SIZE);
+    enemyIcon.load((rootdir+"pic\\enemytank-ico.gif").c_str());
+    enemyIcon = resizePic(enemyIcon,BASESIZE,BASESIZE);
 
-    //加载音效
-    start = new QSound((rootdir+"\\sound\\start.wav").c_str(),this);
-    shoot = new QSound((rootdir+"\\sound\\shoot.wav").c_str(),this);
-    moveSound = new QSound((rootdir+"\\sound\\bk_sound.wav").c_str(),this);
-    start->play();
+    QSound::play((rootdir+"\\sound\\start.wav").c_str());
     //创建敌人
     cursor=0;
     enemyNum = 20;
@@ -209,7 +230,14 @@ void Widget::init()
         createEnemy();
     }
     //创建玩家
+    createPlayer();
+}
+
+void Widget::createPlayer()
+{
+    role1.bullet.setActive(false);
     role1.rect.setRect(9*BASESIZE,24*BASESIZE,SIZE,SIZE);
+    life = 3;
 }
 
 void Widget::createEnemy()
@@ -279,17 +307,20 @@ void Widget::drawFrame()
     {
         paint.drawPixmap(0,i*SIZE,bg_gray);
         paint.drawPixmap(14*SIZE,i*SIZE,bg_gray);
-        paint.drawPixmap(15*SIZE,i*SIZE,bg_gray);
         paint.drawPixmap(i*SIZE,0,bg_gray);
         paint.drawPixmap(i*SIZE,14*SIZE,bg_gray);
     }
 }
 
+void Widget::drawPanel()
+{
+    paint.drawText(6*SIZE,BASESIZE,"敌人数量："+QString::number(enemyNum));
+    paint.drawText(7*SIZE,29*BASESIZE,"生命"+QString::number(life));
+}
+
 void Widget::paintEvent(QPaintEvent *)
 {
     paint.begin(this);
-    //画边框
-    drawFrame();
 
     //转换坐标系统
     paint.save();
@@ -304,17 +335,31 @@ void Widget::paintEvent(QPaintEvent *)
     state = !state;
     //画玩家子弹
     role1.bullet.display(paint);
+    if(role1.bullet.bump)
+    {
+        role1.bullet.showExplosion(paint);
+    }
     // 画敌人
     for(auto& enemy:enemies)
     {
         //画子弹
         enemy.bullet.display(paint);
+        if(enemy.bullet.bump)
+        {
+            enemy.bullet.showExplosion(paint);
+        }
         //画坦克
         enemy.display(paint,state);
     }
 
     //重置坐标系统
     paint.restore();
+
+    //画边框
+    drawFrame();
+    //画信息面板
+    drawPanel();
+
     paint.end();
 
 }

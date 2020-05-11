@@ -23,23 +23,28 @@ private:
     QPixmap iron;
     QPixmap bg_gray;
     QPixmap camp;
+    QPixmap enemyIcon;
+    QPixmap playerIcon;
     void init();
-
+    void createPlayer();
     player role1;
     QPainter paint;
-    QTimer* timer;
-    QSound* start;
-    QSound* shoot;
-    QSound* moveSound;
+    QTimer* timer1;
+    QTimer* timer2;
+    QTimer* timer3;
+    QTimer* timer4;
+    QTimer* timer5;
     int cursor;
     QList<Enemy> enemies;
     int enemyNum;
+    int life;
     int gate;
     void createEnemy();
 protected:
     void loadMap();
     void drawMap();
     void drawFrame();
+    void drawPanel();
     void paintEvent(QPaintEvent *) override;
 public:
     Widget(QWidget *parent = nullptr);
@@ -50,5 +55,9 @@ public:
     void nextGate();
 public slots:
     void play();
+    void enemyMove();
+    void enemyShot();
+    void bulletMove();
+    void refresh();
 };
 #endif // WIDGET_H

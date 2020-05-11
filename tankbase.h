@@ -25,6 +25,8 @@ public:
     virtual void display(QPainter&,bool);
     bool canReachable(int,int,direct);
     tankBase();
+    tankBase& operator=(const tankBase&);
+    tankBase(const tankBase&);
     ~tankBase();
 };
 
