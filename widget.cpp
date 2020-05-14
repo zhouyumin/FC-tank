@@ -280,12 +280,15 @@ void Widget::loadMap()
     try
     {
         if(NULL==(file=fopen((QCoreApplication::applicationDirPath()+"\\res\\map.dat").toStdString().c_str(),"rb")))
-            throw "can not open map.dat";
+            throw "无法加载地图，请确保可执行文件所在目录的res目录下有map.dat文件，并且该游戏不放在中文目录下";
 
     }
     catch(const char *err)
     {
-        qDebug()<<err;
+        QMessageBox msg(QMessageBox::Icon(QMessageBox::Icon::Critical),"ERROR",err);
+        msg.exec();
+        exit(-1);
+
     }
     fseek(file,sizeof(map)*(gate-1),SEEK_SET);
     fread(&map,sizeof(map),1,file);
