@@ -35,5 +35,7 @@
         <file>res/pic/bullet-2.gif</file>
         <file>res/pic/bullet-3.gif</file>
         <file>res/pic/icon.png</file>
+        <file>res/sound/player_bomb.wav</file>
+        <file>res/pic/camp1.gif</file>
     </qresource>
 </RCC>

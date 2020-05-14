@@ -25,6 +25,7 @@ Bullet::Bullet()
 //    bump2 = resizePic(bump2,BASESIZE,BASESIZE);
     bump3.load((rootdir+"\\pic\\bump3.gif").c_str());
     bump3 = resizePic(bump3,BASESIZE,BASESIZE);
+    rect.setRect(-1,-1,0,0);
 }
 
 Bullet::Bullet(const Bullet &other)

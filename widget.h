@@ -12,6 +12,9 @@
 #include <QList>
 #include <enemy.h>
 #include <QCoreApplication>
+#include <QMessageBox>
+#include <QThread>
+static const int RETCODE_RESTART = 773;
 
 class Widget : public QWidget
 {
@@ -27,6 +30,7 @@ private:
     void init();
     void createPlayer();
     player role1;
+    QRect campRect;
     QPainter paint;
     QTimer* timer1;
     QTimer* timer2;
@@ -45,6 +49,7 @@ protected:
     void drawFrame();
     void drawPanel();
     void paintEvent(QPaintEvent *) override;
+    void gameOver();
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();

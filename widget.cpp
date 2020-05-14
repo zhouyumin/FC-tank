@@ -7,23 +7,35 @@ Widget::Widget(QWidget *parent)
     setWindowTitle("坦克大战");
     setStyleSheet("background-color:black;");
     setWindowIcon(QIcon((rootdir+"pic//icon.png").c_str()));
-    gate=1;
-    init();
+    campRect.setRect(12*BASESIZE,24*BASESIZE,SIZE,SIZE);
+    //加载图像
+    bg_gray.load((rootdir+"pic\\bg_gray.gif").c_str());
+    bg_gray=resizePic(bg_gray,SIZE,SIZE);
+    grass.load((rootdir+"pic\\forest.gif").c_str());
+    grass = resizePic(grass,BASESIZE,BASESIZE);
+    brick.load((rootdir+"pic\\wall.gif").c_str());
+    brick = resizePic(brick,BASESIZE,BASESIZE);
+    iron.load((rootdir+"pic\\stone.gif").c_str());
+    iron = resizePic(iron,BASESIZE,BASESIZE);
+    water.load((rootdir+"pic\\river-0.gif").c_str());
+    water = resizePic(water,BASESIZE,BASESIZE);
+    ice.load((rootdir+"pic\\ice.gif").c_str());
+    ice = resizePic(ice,BASESIZE,BASESIZE);
+    camp.load((rootdir+"pic\\camp0.gif").c_str());
+    camp = resizePic(camp,SIZE,SIZE);
+
     timer1 = new QTimer(this);
-    timer1->start(120);
     timer2 = new QTimer(this);
-    timer2->start(150);
     timer3 = new QTimer(this);
-    timer3->start(1000);
     timer4 = new QTimer(this);
-    timer4->start(60);
     timer5 = new QTimer(this);
-    timer5->start(33);
     connect(timer1,&QTimer::timeout,this,&Widget::play);
     connect(timer2,&QTimer::timeout,this,&Widget::enemyMove);
     connect(timer3,&QTimer::timeout,this,&Widget::enemyShot);
     connect(timer4,&QTimer::timeout,this,&Widget::bulletMove);
     connect(timer5,&QTimer::timeout,this,&Widget::refresh);
+    gate=1;
+    init();
 }
 
 Widget::~Widget()
@@ -87,14 +99,21 @@ void Widget::collisionCheck()
             enemy.bullet.setActive(false);
             break;
         }
+        else if(true==campRect.intersects(enemy.bullet.rect)||true==campRect.intersects(role1.bullet.rect))
+        {
+            camp.load((rootdir+"pic\\camp1.gif").c_str());
+            camp = resizePic(camp,SIZE,SIZE);
+            update();
+            gameOver();
+        }
     }
     //玩家子弹和敌方坦克碰撞检测
-    for(auto& enemy:enemies)
+    for(auto enemy=enemies.begin();enemy!=enemies.end();enemy++)
     {
-        if(true==role1.bullet.rect.intersects(enemy.rect))
+        if(true==role1.bullet.rect.intersects(enemy->rect))
         {
             QSound::play((rootdir+"\\sound\\enemy-bomb.wav").c_str());
-            enemies.removeOne(enemy);//需要重载 == 操作符
+            enemies.erase(enemy);//需要重载 == 操作符
             enemyNum--;
             if(enemyNum<=0)
             {
@@ -110,7 +129,15 @@ void Widget::collisionCheck()
     {
         if(true==role1.rect.intersects(enemy.bullet.rect))
         {
-            qDebug()<<"wsl";
+            enemy.bullet.setActive(false);
+            createPlayer();
+            QSound::play((rootdir+"\\sound\\player_bomb.wav").c_str());
+            life--;
+            if(life<=0)
+            {
+                gameOver();
+            }
+            break;
         }
     }
 }
@@ -203,19 +230,7 @@ void Widget::init()
 {
     //加载地图
     loadMap();
-    //加载图像
-    bg_gray.load((rootdir+"pic\\bg_gray.gif").c_str());
-    bg_gray=resizePic(bg_gray,SIZE,SIZE);
-    grass.load((rootdir+"pic\\forest.gif").c_str());
-    grass = resizePic(grass,BASESIZE,BASESIZE);
-    brick.load((rootdir+"pic\\wall.gif").c_str());
-    brick = resizePic(brick,BASESIZE,BASESIZE);
-    iron.load((rootdir+"pic\\stone.gif").c_str());
-    iron = resizePic(iron,BASESIZE,BASESIZE);
-    water.load((rootdir+"pic\\river-0.gif").c_str());
-    water = resizePic(water,BASESIZE,BASESIZE);
-    ice.load((rootdir+"pic\\ice.gif").c_str());
-    ice = resizePic(ice,BASESIZE,BASESIZE);
+
     camp.load((rootdir+"pic\\camp0.gif").c_str());
     camp = resizePic(camp,SIZE,SIZE);
 
@@ -229,13 +244,21 @@ void Widget::init()
     }
     //创建玩家
     createPlayer();
+    life = 3;
+    // 开始游戏
+    timer1->start(120);
+    timer2->start(150);
+    timer3->start(1000);
+    timer4->start(60);
+    timer5->start(33);
 }
 
 void Widget::createPlayer()
 {
     role1.bullet.setActive(false);
+    role1.setDir(direct::up);
+    role1.ismove=false;
     role1.rect.setRect(9*BASESIZE,24*BASESIZE,SIZE,SIZE);
-    life = 3;
 }
 
 void Widget::createEnemy()
@@ -254,7 +277,6 @@ void Widget::loadMap()
     FILE *file;
     try
     {
-
         if(NULL==(file=fopen((QCoreApplication::applicationDirPath()+"\\res\\map.dat").toStdString().c_str(),"rb")))
             throw "can not open map.dat";
 
@@ -297,7 +319,7 @@ void Widget::drawMap()
             }
         }
     }
-    paint.drawPixmap(12*BASESIZE,24*BASESIZE,camp);
+    paint.drawPixmap(campRect.x(),campRect.y(),camp);
 }
 
 void Widget::drawFrame()
@@ -362,5 +384,28 @@ void Widget::paintEvent(QPaintEvent *)
 
     paint.end();
 
+}
+
+void Widget::gameOver()
+{
+    timer1->stop();
+    timer2->stop();
+    timer3->stop();
+    timer4->stop();
+    timer5->stop();
+    QMessageBox msg(QMessageBox::Icon::Question,"GameOver","游戏结束是否重新开始？",(QMessageBox::StandardButton::Ok|QMessageBox::StandardButton::Cancel));
+    if(QMessageBox::Ok == msg.exec())
+    {
+//        qApp->exit(RETCODE_RESTART);
+//        enemies.clear();//线程访问出错
+        for(auto it=enemies.begin();it!=enemies.end();it++)
+            enemies.erase(it);
+        gate=1;
+        init();
+    }
+    else
+    {
+        this->close();
+    }
 }
 
