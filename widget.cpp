@@ -6,6 +6,7 @@ Widget::Widget(QWidget *parent)
     setFixedSize(WIDTH,HEIGHT);
     setWindowTitle("坦克大战");
     setWindowIcon(QIcon((rootdir+"pic//icon.png").c_str()));
+        setStyleSheet("background-color:black;");
     campRect.setRect(12*BASESIZE,24*BASESIZE,SIZE,SIZE);
     //加载图像
     bg_gray.load((rootdir+"pic\\bg_gray.gif").c_str());
@@ -102,6 +103,7 @@ void Widget::collisionCheck()
         }
         else if(true==campRect.intersects(enemy.bullet.rect)||true==campRect.intersects(role1.bullet.rect))
         {
+            QSound::play((rootdir+"\\sound\\player_bomb.wav").c_str());
             camp.load((rootdir+"pic\\camp1.gif").c_str());
             camp = resizePic(camp,SIZE,SIZE);
             update();
@@ -247,7 +249,7 @@ void Widget::init()
     createPlayer();
     life = 3;
     // 开始游戏
-    start = 1500;
+    start = 30;
     timer1->start(120);
     timer2->start(150);
     timer3->start(1000);
@@ -347,9 +349,15 @@ void Widget::drawPanel()
 
 void Widget::drawStart()
 {
+    for(int i=0;i<15;i++)
+    {
+        for(int j=0;j<15;j++)
+        {
+            paint.drawPixmap(i*SIZE,j*SIZE,bg_gray);
+        }
+    }
     paint.setFont(QFont("宋体",24));
     paint.drawText(12*BASESIZE+10,13*BASESIZE+10,"第"+QString::number(gate)+"关");
-    setStyleSheet("background-color:gray;");
 }
 
 void Widget::paintEvent(QPaintEvent *)
@@ -361,7 +369,6 @@ void Widget::paintEvent(QPaintEvent *)
         paint.end();
         return;
     }
-    setStyleSheet("background-color:black;");
     //转换坐标系统
     paint.save();
     paint.translate(SIZE,SIZE);
