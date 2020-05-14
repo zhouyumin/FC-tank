@@ -147,6 +147,12 @@ void Widget::collisionCheck()
 
 void Widget::nextGate()
 {
+    if(gate==35)
+    {
+        QMessageBox msg(QMessageBox::Icon(QMessageBox::Icon::Information),"Victory","恭喜你通过全部关卡");
+        msg.exec();
+        exit(1);
+    }
     gate++;
     init();
 }
