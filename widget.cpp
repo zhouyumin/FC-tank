@@ -5,7 +5,6 @@ Widget::Widget(QWidget *parent)
 {
     setFixedSize(WIDTH,HEIGHT);
     setWindowTitle("坦克大战");
-    setStyleSheet("background-color:black;");
     setWindowIcon(QIcon((rootdir+"pic//icon.png").c_str()));
     campRect.setRect(12*BASESIZE,24*BASESIZE,SIZE,SIZE);
     //加载图像
@@ -21,8 +20,6 @@ Widget::Widget(QWidget *parent)
     water = resizePic(water,BASESIZE,BASESIZE);
     ice.load((rootdir+"pic\\ice.gif").c_str());
     ice = resizePic(ice,BASESIZE,BASESIZE);
-    camp.load((rootdir+"pic\\camp0.gif").c_str());
-    camp = resizePic(camp,SIZE,SIZE);
 
     timer1 = new QTimer(this);
     timer2 = new QTimer(this);
@@ -49,6 +46,10 @@ Widget::~Widget()
 
 void Widget::keyPressEvent(QKeyEvent *event)
 {
+    if(start>0)
+    {
+        return;
+    }
     if(event->key()==Qt::Key::Key_W)
     {
         role1.setDir(direct::up);
@@ -246,6 +247,7 @@ void Widget::init()
     createPlayer();
     life = 3;
     // 开始游戏
+    start = 1500;
     timer1->start(120);
     timer2->start(150);
     timer3->start(1000);
@@ -336,14 +338,27 @@ void Widget::drawFrame()
 
 void Widget::drawPanel()
 {
-    paint.drawText(6*SIZE,BASESIZE,"敌人数量："+QString::number(enemyNum));
+    paint.drawText(6*SIZE,BASESIZE,"第"+QString::number(gate)+"关，敌人数量："+QString::number(enemyNum));
     paint.drawText(7*SIZE,29*BASESIZE,"生命"+QString::number(life));
+}
+
+void Widget::drawStart()
+{
+    paint.setFont(QFont("宋体",24));
+    paint.drawText(12*BASESIZE+10,13*BASESIZE+10,"第"+QString::number(gate)+"关");
+    setStyleSheet("background-color:gray;");
 }
 
 void Widget::paintEvent(QPaintEvent *)
 {
     paint.begin(this);
-
+    if(0<start--)
+    {
+        drawStart();
+        paint.end();
+        return;
+    }
+    setStyleSheet("background-color:black;");
     //转换坐标系统
     paint.save();
     paint.translate(SIZE,SIZE);

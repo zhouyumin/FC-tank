@@ -13,9 +13,7 @@
 #include <enemy.h>
 #include <QCoreApplication>
 #include <QMessageBox>
-#include <QThread>
-static const int RETCODE_RESTART = 773;
-
+//static const int RETCODE_RESTART = 773;
 class Widget : public QWidget
 {
     Q_OBJECT
@@ -42,12 +40,14 @@ private:
     int enemyNum;
     int life;
     int gate;
+    int start;
     void createEnemy();
 protected:
     void loadMap();
     void drawMap();
     void drawFrame();
     void drawPanel();
+    void drawStart();
     void paintEvent(QPaintEvent *) override;
     void gameOver();
 public:
