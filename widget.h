@@ -13,6 +13,8 @@
 #include <enemy.h>
 #include <QCoreApplication>
 #include <QMessageBox>
+#include <fstream>
+#include <iostream>
 //static const int RETCODE_RESTART = 773;
 class Widget : public QWidget
 {

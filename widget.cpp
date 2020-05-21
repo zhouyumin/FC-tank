@@ -3,10 +3,12 @@
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
+
     setFixedSize(WIDTH,HEIGHT);
     setWindowTitle("坦克大战");
     setWindowIcon(QIcon((rootdir+"pic//icon.png").c_str()));
-        setStyleSheet("background-color:black;");
+    setStyleSheet("background-color:black;");
     campRect.setRect(12*BASESIZE,24*BASESIZE,SIZE,SIZE);
     //加载图像
     bg_gray.load((rootdir+"pic\\bg_gray.gif").c_str());
@@ -284,11 +286,14 @@ void Widget::createEnemy()
 
 void Widget::loadMap()
 {
-    FILE *file;
+    std::ifstream file;
     try
     {
-        if(NULL==(file=fopen((QCoreApplication::applicationDirPath()+"\\res\\map.dat").toStdString().c_str(),"rb")))
+        file.open((QCoreApplication::applicationDirPath()+"\\res\\map.dat").toStdString().c_str(),std::ios::in|std::ios::binary);
+        if(!file)
+        {
             throw "无法加载地图，请确保可执行文件所在目录的res目录下有map.dat文件，并且该游戏不放在中文目录下";
+        }
 
     }
     catch(const char *err)
@@ -298,10 +303,9 @@ void Widget::loadMap()
         exit(-1);
 
     }
-    fseek(file,sizeof(map)*(gate-1),SEEK_SET);
-    fread(&map,sizeof(map),1,file);
-    fclose(file);
-    file=nullptr;
+    file.seekg(sizeof(map)*(gate-1));
+    file.read(*map,sizeof(map));
+    file.close();
 }
 
 void Widget::drawMap()
@@ -369,6 +373,8 @@ void Widget::drawStart()
 void Widget::paintEvent(QPaintEvent *)
 {
     paint.begin(this);
+
+    //画关卡过渡界面
     if(0<start--)
     {
         drawStart();
@@ -437,6 +443,7 @@ void Widget::gameOver()
     else
     {
         this->close();
+        exit(0);
     }
 }
 
